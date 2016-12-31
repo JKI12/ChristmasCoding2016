@@ -1,0 +1,56 @@
+﻿@model ChristmasCoding.Web.Models.AccountLink
+<!DOCTYPE html>
+<style>
+    body {
+        overflow: hidden;
+    }
+    .hidden {
+        visibility: hidden;
+        display: none !important;
+    }
+    button {
+        margin: 60px auto;
+        display: block;
+    }
+</style>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width"/>
+    <title>Account Link</title>
+    <link href="~/Content/spinner.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+    <button id="login" onclick="triggerLogin()">Authorise Bot</button>
+    <div id="spinner" class="loader hidden">Loading...</div>
+</body>
+</html>
+
+@Html.Partial("_FacebookScript")
+
+<script>
+    var login = function (response) {
+        document.getElementById('login').className = "hidden";
+        document.getElementById('spinner').className = "loader";
+
+        axios.get('@Html.Raw(Model.PsidRetreivalUrl)')
+            .then(function (r) {
+                var psid = r.data.recipient;
+
+                axios.post('/api/fuser',
+                {
+                    "UserId": response.authResponse.userID,
+                    "AuthToken": response.authResponse.accessToken,
+                    "Psid": psid
+                })
+                .then(function () {
+                    window.location.href = '@Html.Raw(Model.RedirectUri)';
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            })
+            .catch(function(err) {
+                console.error(err);
+            });
+    };
+</script>

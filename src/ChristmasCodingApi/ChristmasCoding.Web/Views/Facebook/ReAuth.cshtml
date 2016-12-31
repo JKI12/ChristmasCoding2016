@@ -1,0 +1,45 @@
+﻿@model ChristmasCoding.Web.Models.AccountLink
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>ReAuth</title>
+</head>
+<body>
+    <div> 
+    </div>
+</body>
+</html>
+
+<script>
+    document.addEventListener('fbInitialised', function(e) {
+        triggerLogin();
+    }, false);
+
+    var login = function (response) {
+        axios.post('/api/fuser',
+        {
+            "UserId": response.authResponse.userID,
+            "AuthToken": response.authResponse.accessToken,
+        })
+        .then(function () {
+            if (!MessengerExtensions.isInExtension()) {
+                window.close();
+            } else {
+                MessengerExtensions.requestCloseBrowser(function success() { }, function error(err) {
+                    console.error(err);
+                });
+            }
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+    }
+</script>
+
+@Html.Partial("_FacebookScript")
